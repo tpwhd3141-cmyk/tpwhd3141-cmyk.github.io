@@ -2,11 +2,12 @@
    GoldHouse — script.js
    1. 모바일 네비게이션
    2. 헤더 스크롤 효과
-   3. 실시간 시세 (metals.live 무료 API)
+   3. 실시간 시세 (metals.live API → 상품 가격 계산용)
    4. 상품 데이터 & 가격 자동 계산
    5. 상품 필터
    6. 차트 탭 전환 (TradingView)
    7. 문의 폼
+   ※ 티커는 TradingView 위젯으로 대체
 =================================================== */
 
 /* ===== 1. 모바일 네비게이션 ===== */
@@ -224,36 +225,6 @@ function updateProductPrices() {
   });
 }
 
-/* ===== 티커 렌더링 ===== */
-function renderTicker() {
-  const track = document.getElementById('tickerTrack');
-  if (!prices.XAU) return;
-
-  const items = [
-    { name: '금 (1g)', usd: prices.XAU / TROY_OZ_TO_G, key: 'XAU_g' },
-    { name: '금 (1oz)', usd: prices.XAU, key: 'XAU_oz' },
-    { name: '은 (1g)', usd: prices.XAG / TROY_OZ_TO_G, key: 'XAG_g' },
-    { name: '은 (1oz)', usd: prices.XAG, key: 'XAG_oz' },
-    { name: '백금 (1g)', usd: prices.XPT / TROY_OZ_TO_G, key: 'XPT_g' },
-    { name: '팔라듐 (1g)', usd: prices.XPD / TROY_OZ_TO_G, key: 'XPD_g' },
-  ];
-
-  // 무한 스크롤을 위해 2번 반복
-  const makeItems = () => items.map(item => {
-    const krw = Math.round(item.usd * krwRate);
-    // 가격 변동은 실제 API에서 제공하지 않으므로 표시 생략 또는 정적 표기
-    return `
-      <span class="tick-item">
-        <span class="name">${item.name}</span>
-        <span class="price">${formatKrw(krw)}</span>
-      </span>
-      <span class="tick-sep">·</span>
-    `;
-  }).join('');
-
-  track.innerHTML = makeItems() + makeItems();
-}
-
 /* ===== 5. 상품 필터 ===== */
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -311,13 +282,11 @@ async function init() {
   await Promise.all([fetchKrwRate(), fetchMetalPrices()]);
 
   // 시세 반영
-  renderTicker();
   updateProductPrices();
 
   // 5분마다 자동 갱신
   setInterval(async () => {
     await Promise.all([fetchKrwRate(), fetchMetalPrices()]);
-    renderTicker();
     updateProductPrices();
   }, 5 * 60 * 1000);
 }
