@@ -1,0 +1,32 @@
+body {
+    background-color: #1a1a1a;
+    color: #d4af37; /* 금색 포인트 */
+    font-family: sans-serif;
+    text-align: center;
+    margin: 0;
+}
+
+header { padding: 50px; }
+
+.product-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    border: 1px solid #d4af37;
+    padding: 20px;
+    width: 200px;
+    border-radius: 10px;
+}
+
+button {
+    background-color: #d4af37;
+    color: #1a1a1a;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
