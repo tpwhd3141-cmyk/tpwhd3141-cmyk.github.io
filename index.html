@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoldHouse | 귀금속 전문 딜러</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER / NAV -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <div class="logo">GOLD<span>HOUSE</span></div>
+
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="nav">
+        <ul>
+          <li><a href="#products">상품</a></li>
+          <li><a href="#categories">카테고리</a></li>
+          <li><a href="#prices">시세</a></li>
+          <li><a href="#buyback">매입 안내</a></li>
+          <li><a href="#about">회사 소개</a></li>
+        </ul>
+        <a href="#contact" class="btn-nav">상담 문의</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MOBILE NAV OVERLAY -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack">
+      <span class="tick-loading">시세 불러오는 중...</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">TRUSTED PRECIOUS METALS DEALER</div>
+      <h1 class="hero-title">진짜 가치,<br><em>귀금속으로</em><br>보존하세요</h1>
+      <p class="hero-desc">골드하우스는 금·은·백금 실물 귀금속 전문 딜러입니다.<br>투명한 시세, 안전한 거래, 전문가 상담을 제공합니다.</p>
+      <div class="hero-btns">
+        <a href="#products" class="btn-gold">상품 둘러보기</a>
+        <a href="#prices" class="btn-outline">실시간 시세</a>
+      </div>
+    </div>
+    <div class="hero-deco" aria-hidden="true">
+      <div class="deco-circle c1"></div>
+      <div class="deco-circle c2"></div>
+      <div class="deco-text">GOLD · SILVER · PLATINUM</div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat"><span class="stat-num">15+</span><span class="stat-label">년 신뢰</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">200+</span><span class="stat-label">취급 상품</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">5,000+</span><span class="stat-label">고객</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">100%</span><span class="stat-label">실시간 시세</span></div>
+    </div>
+  </div>
+
+  <!-- TRADINGVIEW CHART -->
+  <section class="section" id="prices">
+    <div class="section-title">
+      <span class="eyebrow">LIVE MARKET</span>
+      <h2>실시간 시세</h2>
+    </div>
+    <div class="chart-tabs">
+      <button class="chart-tab active" data-symbol="XAUUSD">금 (Gold)</button>
+      <button class="chart-tab" data-symbol="XAGUSD">은 (Silver)</button>
+      <button class="chart-tab" data-symbol="XPTUSD">백금 (Platinum)</button>
+    </div>
+    <div class="chart-wrap" id="chartWrap">
+      <!-- TradingView Widget -->
+      <div class="tradingview-widget-container" style="height:400px;">
+        <div id="tradingview_chart"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript" id="tvScript">
+          var tvWidget = null;
+          function loadChart(symbol) {
+            var container = document.getElementById('tradingview_chart');
+            container.innerHTML = '';
+            if (typeof TradingView !== 'undefined') {
+              tvWidget = new TradingView.widget({
+                autosize: true,
+                symbol: symbol,
+                interval: "D",
+                timezone: "Asia/Seoul",
+                theme: "dark",
+                style: "1",
+                locale: "kr",
+                toolbar_bg: "#0d0d0d",
+                enable_publishing: false,
+                hide_top_toolbar: false,
+                hide_legend: false,
+                save_image: false,
+                container_id: "tradingview_chart",
+                backgroundColor: "#0d0d0d",
+                gridColor: "#1a1810",
+                studies: []
+              });
+            }
+          }
+          document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() { loadChart('XAUUSD'); }, 500);
+          });
+        </script>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section" id="categories">
+    <div class="section-title">
+      <span class="eyebrow">CATEGORIES</span>
+      <h2>카테고리</h2>
+    </div>
+    <div class="cat-grid">
+      <a href="#products" class="cat-card" data-filter="gold">
+        <span class="cat-icon">🥇</span>
+        <span class="cat-name">금</span>
+        <span class="cat-sub">금괴 · 금화 · 금바</span>
+      </a>
+      <a href="#products" class="cat-card" data-filter="silver">
+        <span class="cat-icon">🥈</span>
+        <span class="cat-name">은</span>
+        <span class="cat-sub">은괴 · 은화 · 은바</span>
+      </a>
+      <a href="#products" class="cat-card" data-filter="platinum">
+        <span class="cat-icon">💎</span>
+        <span class="cat-name">백금</span>
+        <span class="cat-sub">산업용 · 투자용</span>
+      </a>
+      <a href="#products" class="cat-card" data-filter="collectible">
+        <span class="cat-icon">🪙</span>
+        <span class="cat-name">수집 주화</span>
+        <span class="cat-sub">한정판 · 기념주화</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="section" id="products">
+    <div class="section-title">
+      <span class="eyebrow">FEATURED PRODUCTS</span>
+      <h2>인기 상품</h2>
+    </div>
+
+    <div class="notice">
+      <span>⚠</span>
+      <p>상품 가격은 <strong>실시간 국제 시세</strong>를 반영하여 자동으로 변동됩니다. 최종 거래가는 주문 확인 시점 기준입니다.</p>
+    </div>
+
+    <div class="filter-btns">
+      <button class="filter-btn active" data-filter="all">전체</button>
+      <button class="filter-btn" data-filter="gold">금</button>
+      <button class="filter-btn" data-filter="silver">은</button>
+      <button class="filter-btn" data-filter="platinum">백금</button>
+      <button class="filter-btn" data-filter="collectible">수집</button>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+      <!-- JS로 렌더링 -->
+    </div>
+  </section>
+
+  <!-- BUYBACK -->
+  <section class="section buyback-section" id="buyback">
+    <div class="buyback-inner">
+      <div class="buyback-text">
+        <span class="eyebrow">BUY BACK</span>
+        <h2>귀금속 매입</h2>
+        <p>보유하고 계신 금·은·백금 제품을 실시간 시세로 투명하게 매입합니다. 금화, 금괴, 은화 등 모든 실물 귀금속 환영합니다.</p>
+        <ul class="buyback-list">
+          <li>✔ 실시간 시세 기반 공정 가격</li>
+          <li>✔ 당일 현금 정산</li>
+          <li>✔ 전국 택배 매입 가능</li>
+          <li>✔ 감정 무료</li>
+        </ul>
+        <a href="#contact" class="btn-gold">매입 문의하기</a>
+      </div>
+      <div class="buyback-deco" aria-hidden="true">
+        <div class="buyback-circle">
+          <span>BUY<br>BACK</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="section-title">
+      <span class="eyebrow">ABOUT US</span>
+      <h2>골드하우스 소개</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-card">
+        <span class="about-icon">🏆</span>
+        <h3>15년 업력</h3>
+        <p>2010년 설립 이후 15년간 귀금속 전문 딜러로서 쌓아온 신뢰와 경험</p>
+      </div>
+      <div class="about-card">
+        <span class="about-icon">📊</span>
+        <h3>투명한 시세</h3>
+        <p>국제 시세를 실시간으로 반영한 투명한 가격 정책, 숨겨진 수수료 없음</p>
+      </div>
+      <div class="about-card">
+        <span class="about-icon">🔒</span>
+        <h3>안전한 거래</h3>
+        <p>정품 인증서 제공, 안전 포장 발송, 보험 처리까지 완벽한 거래 보장</p>
+      </div>
+      <div class="about-card">
+        <span class="about-icon">💬</span>
+        <h3>전문가 상담</h3>
+        <p>귀금속 투자 전문가의 1:1 상담으로 최적의 포트폴리오 구성 지원</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section contact-section" id="contact">
+    <div class="section-title">
+      <span class="eyebrow">CONTACT</span>
+      <h2>상담 문의</h2>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-item">
+          <span class="contact-label">전화</span>
+          <span class="contact-val">02-0000-0000</span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-label">이메일</span>
+          <span class="contact-val">info@goldhouse.kr</span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-label">영업시간</span>
+          <span class="contact-val">평일 09:00 – 18:00</span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-label">주소</span>
+          <span class="contact-val">서울특별시 강남구 테헤란로 000</span>
+        </div>
+      </div>
+      <form class="contact-form" id="contactForm">
+        <input type="text" placeholder="이름" required />
+        <input type="tel" placeholder="연락처" required />
+        <select>
+          <option value="">문의 유형 선택</option>
+          <option>구매 문의</option>
+          <option>매입 문의</option>
+          <option>투자 상담</option>
+          <option>기타</option>
+        </select>
+        <textarea placeholder="문의 내용을 입력해주세요" rows="4"></textarea>
+        <button type="submit" class="btn-gold">문의 보내기</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo">GOLD<span>HOUSE</span></div>
+          <p>금·은·백금 실물 귀금속 전문 딜러<br>투명한 거래, 신뢰할 수 있는 파트너</p>
+        </div>
+        <div class="footer-col">
+          <h4>상품</h4>
+          <ul>
+            <li><a href="#">금</a></li>
+            <li><a href="#">은</a></li>
+            <li><a href="#">백금</a></li>
+            <li><a href="#">수집 주화</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>서비스</h4>
+          <ul>
+            <li><a href="#">실시간 시세</a></li>
+            <li><a href="#">귀금속 매입</a></li>
+            <li><a href="#">보관 서비스</a></li>
+            <li><a href="#">투자 상담</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>회사</h4>
+          <ul>
+            <li><a href="#">회사 소개</a></li>
+            <li><a href="#">공지사항</a></li>
+            <li><a href="#">이용약관</a></li>
+            <li><a href="#">개인정보처리방침</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 GoldHouse. All rights reserved.</p>
+        <p>사업자등록번호: 000-00-00000 | 대표: 홍길동 | 서울특별시 강남구</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
