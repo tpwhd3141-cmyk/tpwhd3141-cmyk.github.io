@@ -157,39 +157,15 @@ button { cursor: pointer; font-family: var(--font-body); }
 
 /* ===== TICKER ===== */
 .ticker-wrap {
-  background: var(--bg2);
   border-bottom: 1px solid var(--border);
   overflow: hidden;
-  height: 36px;
-  display: flex;
-  align-items: center;
 }
-.ticker-track {
-  display: flex;
-  gap: 48px;
-  white-space: nowrap;
-  animation: tickerScroll 30s linear infinite;
-  padding-left: 100%;
+.ticker-wrap .tradingview-widget-container {
+  width: 100%;
 }
-@keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+.ticker-wrap .tradingview-widget-container__widget {
+  height: 46px;
 }
-.ticker-track:hover { animation-play-state: paused; }
-.tick-loading { font-size: 12px; color: var(--text-muted); padding-left: 24px; }
-
-.tick-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.tick-item .name { color: var(--gold); font-weight: 600; letter-spacing: 1px; }
-.tick-item .price { color: var(--text); }
-.tick-item .up { color: var(--up); }
-.tick-item .dn { color: var(--dn); }
-.tick-sep { color: var(--border); }
 
 /* ===== HERO ===== */
 .hero {
