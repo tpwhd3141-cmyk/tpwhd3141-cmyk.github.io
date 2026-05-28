@@ -36,10 +36,26 @@
   <!-- MOBILE NAV OVERLAY -->
   <div class="nav-overlay" id="navOverlay"></div>
 
-  <!-- TICKER -->
+  <!-- TICKER (TradingView) -->
   <div class="ticker-wrap">
-    <div class="ticker-track" id="tickerTrack">
-      <span class="tick-loading">시세 불러오는 중...</span>
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+      {
+        "symbols": [
+          { "proName": "OANDA:XAUUSD", "title": "금 Gold" },
+          { "proName": "OANDA:XAGUSD", "title": "은 Silver" },
+          { "proName": "OANDA:XPTUSD", "title": "백금 Platinum" },
+          { "proName": "OANDA:XPDUSD", "title": "팔라듐 Palladium" },
+          { "proName": "FX_IDC:USDKRW", "title": "달러/원" }
+        ],
+        "showSymbolLogo": false,
+        "isTransparent": false,
+        "displayMode": "adaptive",
+        "colorTheme": "light",
+        "locale": "kr"
+      }
+      </script>
     </div>
   </div>
 
