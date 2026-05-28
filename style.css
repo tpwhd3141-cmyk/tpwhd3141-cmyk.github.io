@@ -1,6 +1,0 @@
-// 나중에 검색 버튼 클릭 시 동작을 추가할 곳입니다.
-document.querySelector('button').addEventListener('click', function() {
-    alert('검색 기능을 준비 중입니다.');
-});
-
-console.log("사이트가 로드되었습니다.");
