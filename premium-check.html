@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>메이플 vs 최저premium 가격차 확인</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Noto Sans KR", sans-serif;
+    background: #f7f5f0;
+    margin: 0;
+    padding: 20px;
+    color: #2a2a2a;
+  }
+  .card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 24px;
+  }
+  h1 {
+    font-size: 17px;
+    margin: 0 0 4px;
+    color: #1a1a1a;
+  }
+  .sub {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 20px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .row:last-child { border-bottom: none; }
+  .label { font-size: 14px; color: #555; }
+  .label .name { font-weight: 600; color: #1a1a1a; display: block; font-size: 15px; }
+  .value { font-size: 16px; font-weight: 700; text-align: right; }
+  .diff-box {
+    margin-top: 18px;
+    padding: 18px;
+    background: linear-gradient(135deg, #C8A84B15, #C8A84B08);
+    border: 1px solid #C8A84B40;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .diff-box .diff-label { font-size: 13px; color: #8a7333; margin-bottom: 6px; }
+  .diff-box .diff-value { font-size: 26px; font-weight: 800; color: #8a7333; }
+  .diff-box .diff-premium { font-size: 12px; color: #a8935c; margin-top: 6px; }
+  .refresh-btn {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .refresh-btn:active { opacity: 0.7; }
+  .refresh-btn:disabled { opacity: 0.5; }
+  .status { text-align: center; font-size: 12px; color: #aaa; margin-top: 12px; }
+  .error { color: #c0392b; text-align: center; padding: 20px; font-size: 13px; }
+  .anomaly {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #fdecea;
+    border: 1px solid #f5b7b1;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #a03020;
+  }
+</style>
+</head>
+<body>
+  <div class="card" id="app">
+    <h1>메이플리프 vs 최저premium 가격차</h1>
+    <div class="sub">구글 시트를 직접 fetch해서 실시간 계산 (사이트와 동일 로직)</div>
+    <div id="content">로딩 중...</div>
+    <button class="refresh-btn" id="refreshBtn" onclick="load()">다시 확인</button>
+    <div class="status" id="status"></div>
+  </div>
+
+<script>
+const SHEET_ID = '1gMqKhtWwTAizoBGlrGDpm6sl5c6vmbotGzg3qXl16-w';
+
+async function fetchSheetTab(tabName) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`시트 응답 오류 (${res.status})`);
+  const text = await res.text();
+  const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+  if (!match) throw new Error('시트 응답 파싱 실패');
+  return JSON.parse(match[1]);
+}
+
+function fmtWon(n) {
+  return `₩${Math.round(n).toLocaleString()}`;
+}
+
+async function load() {
+  const content = document.getElementById('content');
+  const status = document.getElementById('status');
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  content.innerHTML = '로딩 중...';
+  status.textContent = '';
+
+  try {
+    // 1) "상품" 탭 → 상품별 premium
+    const productsJson = await fetchSheetTab('상품');
+    const rows = productsJson.table.rows;
+    const products = rows.map(r => {
+      const c = r.c;
+      return {
+        name: c[0]?.v || '',
+        brand: c[1]?.v || '',
+        premium: parseFloat(c[3]?.v) || null,
+      };
+    }).filter(p => p.name && p.premium);
+
+    if (!products.length) throw new Error('상품 데이터를 찾지 못함');
+
+    // 2) "계산" 탭 → 금시세(USD) + 환율(KRW)
+    const calcJson = await fetchSheetTab('계산');
+    const calcRow = calcJson.table.rows[0].c;
+    const goldPriceUsd = calcRow[0]?.v;
+    const exchangeRate = calcRow[4]?.v;
+
+    if (!goldPriceUsd || !exchangeRate) throw new Error('금시세/환율 데이터를 찾지 못함');
+
+    const krwPerOz = goldPriceUsd * exchangeRate;
+
+    // 3) 메이플리프 찾기
+    const maple = products.find(p => p.name.includes('메이플'));
+    // 4) 최저 premium 찾기
+    const minProduct = products.reduce((min, p) => (p.premium < min.premium ? p : min), products[0]);
+
+    if (!maple) throw new Error('메이플리프 상품을 시트에서 찾지 못함');
+
+    const priceOf = (premium) => Math.round(krwPerOz * premium / 1000) * 1000;
+    const maplePrice = priceOf(maple.premium);
+    const minPrice = priceOf(minProduct.premium);
+    const diff = maplePrice - minPrice;
+
+    let anomalyHtml = '';
+    // premium이 다른 상품들 평균에서 크게 벗어나면 이상치로 경고 (임시 오타 등 감지용)
+    const avgPremium = products.reduce((s, p) => s + p.premium, 0) / products.length;
+    if (maple.premium > avgPremium * 1.5) {
+      anomalyHtml = `<div class="anomaly">⚠️ 메이플리프 premium(${maple.premium})이 전체 평균(${avgPremium.toFixed(3)})보다 눈에 띄게 높습니다. 시트 오타 여부를 확인해보세요.</div>`;
+    }
+
+    content.innerHTML = `
+      <div class="row">
+        <div class="label"><span class="name">${maple.name}</span>premium ${maple.premium}</div>
+        <div class="value">${fmtWon(maplePrice)}</div>
+      </div>
+      <div class="row">
+        <div class="label"><span class="name">${minProduct.name}</span>premium ${minProduct.premium} (최저)</div>
+        <div class="value">${fmtWon(minPrice)}</div>
+      </div>
+      <div class="diff-box">
+        <div class="diff-label">가격 차이</div>
+        <div class="diff-value">${fmtWon(diff)}</div>
+        <div class="diff-premium">premium 차이: ${(maple.premium - minProduct.premium).toFixed(3)}</div>
+      </div>
+      ${anomalyHtml}
+    `;
+    status.textContent = `금시세 $${Number(goldPriceUsd).toFixed(2)} × 환율 ${Number(exchangeRate).toLocaleString()}원 기준 · ${new Date().toLocaleTimeString('ko-KR')} 조회`;
+  } catch (e) {
+    content.innerHTML = `<div class="error">불러오기 실패: ${e.message}<br><br>시트가 "링크가 있는 모든 사용자에게 공개"로 공유되어 있는지 확인해주세요.</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+load();
+</script>
+</body>
+</html>
