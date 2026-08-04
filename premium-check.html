@@ -200,7 +200,7 @@ function fmtWon(n) {
 
 // ---- 일별 기록 (localStorage) ----
 const HISTORY_KEY = 'premiumCheckHistory';
-const HISTORY_MAX = 60; // 최대 보관 일수
+const HISTORY_MAX = 95; // 최대 보관 일수
 
 function todayKey() {
   const d = new Date();
@@ -240,8 +240,8 @@ function saveTodaySnapshot(entry) {
 // 두 API 모두 실제 시장 데이터입니다. 다만 과거 시점의 premium(할증율)은
 // 오늘 시트 값으로 고정 가정하여 계산하므로, premium을 그 사이 조정한 적이 있다면
 // 그 구간의 정확도는 떨어집니다 → "추정" 뱃지로 구분 표시.
-const BACKFILL_FLAG_KEY = 'premiumCheckBackfilledV2';
-const BACKFILL_DAYS = 45; // 최근 며칠치를 백필할지
+const BACKFILL_FLAG_KEY = 'premiumCheckBackfilledV3';
+const BACKFILL_DAYS = 90; // 최근 며칠치를 백필할지
 
 async function fetchGoldHistory() {
   const res = await fetch('https://xaus.com/api/v1/history');
