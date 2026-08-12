@@ -172,6 +172,14 @@
     <div class="status" id="status"></div>
   </div>
 
+  <div class="history-section" id="sprottCard">
+    <div class="history-header">
+      <h2>Sprott Money 비교값 (북미, 자동)</h2>
+    </div>
+    <div id="sprottContent"><div class="history-empty">불러오는 중...</div></div>
+    <div class="history-note">Sprott Money(캐나다, USD) 2026 1oz 메이플리프 판매가 × 실시간 USD→KRW 환율. GitHub Actions가 6시간마다 자동 갱신 (수동 입력 없음)</div>
+  </div>
+
   <div class="history-section">
     <div class="history-header">
       <h2>일별 기록</h2>
@@ -196,6 +204,53 @@ async function fetchSheetTab(tabName) {
 
 function fmtWon(n) {
   return `₩${Math.round(n).toLocaleString()}`;
+}
+
+// ---- Sprott Money 비교값 (GitHub Actions가 6시간마다 자동 생성하는 JSON) ----
+let currentMaplePriceForCompare = null; // load()가 메이플리프 가격을 구하면 채워짐
+
+async function loadSprottCompare() {
+  const el = document.getElementById('sprottContent');
+  try {
+    // 캐시 방지용 타임스탬프 쿼리
+    const res = await fetch(`data/sprott-compare.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error(`데이터 파일 응답 오류 (${res.status})`);
+    const data = await res.json();
+
+    if (!data.success) {
+      el.innerHTML = `<div class="error">Sprott 데이터 갱신 실패: ${data.error || '알 수 없는 오류'}<br>(마지막 시도: ${new Date(data.generatedAt).toLocaleString('ko-KR')})</div>`;
+      return;
+    }
+
+    const updatedAt = new Date(data.generatedAt).toLocaleString('ko-KR');
+    let diffHtml = '';
+    if (currentMaplePriceForCompare) {
+      const diff = currentMaplePriceForCompare - data.priceKrw;
+      const diffLabel = diff >= 0 ? '우리 사이트가 더 비쌈' : '우리 사이트가 더 저렴';
+      diffHtml = `
+        <div class="row">
+          <div class="label">가격 차이 (메이플 기준)</div>
+          <div class="value">${fmtWon(Math.abs(diff))}</div>
+        </div>
+        <div class="history-note" style="margin-top:0">${diffLabel}</div>
+      `;
+    }
+
+    el.innerHTML = `
+      <div class="row">
+        <div class="label"><span class="name">Sprott Money 판매가</span>$${data.priceUsd.toLocaleString()} USD</div>
+        <div class="value">${fmtWon(data.priceKrw)}</div>
+      </div>
+      <div class="row">
+        <div class="label">적용 환율 (USD→KRW)</div>
+        <div class="value">${Number(data.usdToKrw).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+      </div>
+      ${diffHtml}
+      <div class="history-note" style="margin-top:8px">자동 갱신: ${updatedAt}</div>
+    `;
+  } catch (e) {
+    el.innerHTML = `<div class="error">불러오기 실패: ${e.message}</div>`;
+  }
 }
 
 // ---- 일별 기록 (localStorage) ----
@@ -439,6 +494,9 @@ async function load() {
     });
     renderHistory();
     backfillHistory(maple, minProduct);
+
+    currentMaplePriceForCompare = maplePrice;
+    loadSprottCompare();
   } catch (e) {
     content.innerHTML = `<div class="error">불러오기 실패: ${e.message}<br><br>시트가 "링크가 있는 모든 사용자에게 공개"로 공유되어 있는지 확인해주세요.</div>`;
   } finally {
@@ -448,6 +506,7 @@ async function load() {
 
 renderHistory();
 load();
+loadSprottCompare(); // 메이플 가격 계산과 무관하게 우선 1회 표시 (성공 시 load()에서 차액 포함해 재렌더링)
 </script>
 </body>
 </html>

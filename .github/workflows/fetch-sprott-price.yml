@@ -1,0 +1,33 @@
+name: Sprott Money 비교값 자동 갱신
+
+# 매 6시간마다 자동 실행 + 수동 실행도 가능
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 */6 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-sprott-price:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 가격/환율 가져와서 data/sprott-compare.json 생성
+        run: node scripts/fetch-sprott-price.js
+
+      - name: 변경사항 커밋 및 push
+        if: always()
+        run: |
+          git config user.name "sprott-price-bot"
+          git config user.email "actions@github.com"
+          git pull --rebase origin main
+          git add data/sprott-compare.json
+          git commit -m "chore: Sprott Money 비교값 자동 갱신 [skip ci]" || echo "변경사항 없음"
+          git push origin HEAD:main
