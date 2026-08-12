@@ -1,0 +1,31 @@
+name: 스크레이핑 테스트 (truney/wowpass 접속 가능 여부 확인)
+
+# 수동 실행 전용. 성공 여부 확인 후 실제 자동화 워크플로우로 교체 예정.
+on:
+  workflow_dispatch:
+
+jobs:
+  test-scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Playwright 설치
+        run: |
+          npm install playwright@1.46.0
+          npx playwright install --with-deps chromium
+
+      - name: 테스트 스크립트 실행
+        run: node scripts/test-scrape.js
+
+      - name: 스크린샷 업로드 (성공/실패 무관하게 확인용)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrape-test-screenshots
+          path: scripts/test-output-*.png
+          if-no-files-found: ignore
