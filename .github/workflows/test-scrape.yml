@@ -4,6 +4,9 @@ name: 스크레이핑 테스트 (truney/wowpass 접속 가능 여부 확인)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   test-scrape:
     runs-on: ubuntu-latest
@@ -19,8 +22,17 @@ jobs:
           npm install playwright@1.46.0
           npx playwright install --with-deps chromium
 
-      - name: 테스트 스크립트 실행
-        run: node scripts/test-scrape.js
+      - name: 테스트 스크립트 실행 (결과를 로그 파일로도 저장)
+        run: node scripts/test-scrape.js 2>&1 | tee scripts/test-output.log
+
+      - name: 결과를 레포에 커밋
+        if: always()
+        run: |
+          git config user.name "test-scrape-bot"
+          git config user.email "actions@github.com"
+          git add scripts/test-output.log scripts/test-output-*.png || true
+          git commit -m "test: 스크레이핑 테스트 결과 [skip ci]" || echo "변경사항 없음"
+          git push origin HEAD:main
 
       - name: 스크린샷 업로드 (성공/실패 무관하게 확인용)
         if: always()
