@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-08-12T10:15:27.214Z",
+  "source": {
+    "price": "https://www.sprottmoney.com/2026-1-oz-gold-maple-leaf-coin-royal-canadian-mint",
+    "rate": "fawazahmed0/currency-api (USD base)"
+  },
+  "success": true,
+  "priceUsd": 4544.33,
+  "usdToKrw": 1415.46600983,
+  "priceKrw": 6432345
+}
